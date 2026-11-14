@@ -10,6 +10,24 @@ let
   themes = "${osConfig.programs.nh.flake}/home/olivia/themes";
   art = path: config.lib.file.mkOutOfStoreSymlink "${themes}/art/${path}";
   artPath = path: "${themes}/art/${path}";
+
+  # Taskbar pins on the main screen, left to right
+  taskbarLaunchers = [
+    "applications:systemsettings.desktop"
+    "preferred://filemanager"
+    "preferred://browser"
+    "applications:tv.plex.Plex.desktop"
+    "applications:plexamp.desktop"
+    "applications:org.wezfurlong.wezterm.desktop"
+    "applications:cz.viceverse.serein.desktop"
+    "applications:com.anthropic.Claude.desktop"
+    "applications:obsidian.desktop"
+    "applications:ai.storyteller.photocraft.desktop"
+    "applications:termius-app.desktop"
+    "applications:code.desktop"
+    "applications:tidal-hifi.desktop"
+    "applications:steam.desktop"
+  ];
 in
 {
   xdg.dataFile = {
@@ -44,6 +62,27 @@ in
         (artPath "wallpapers/GpIWw6Ma4AAXh2A.png")
         (artPath "wallpapers/D2uFrIz.png")
       ];
+    };
+
+    # Sets taskbarLaunchers on screen 0's task manager at every login; screen 1's pins are left alone
+    startup = {
+      dataFile."taskbar-launchers.js" = ''
+        panels().forEach(function (panel) {
+          if (panel.screen !== 0) return;
+          panel.widgets("org.kde.plasma.icontasks").forEach(function (widget) {
+            widget.currentConfigGroup = ["General"];
+            widget.writeConfig("launchers", ${builtins.toJSON taskbarLaunchers});
+          });
+        });
+      '';
+      startupScript.taskbar-launchers = {
+        text = ''
+          qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
+            "$(cat ${config.xdg.dataHome}/plasma-manager/${config.programs.plasma.startup.dataDir}/taskbar-launchers.js)"
+        '';
+        priority = 4;
+        runAlways = true;
+      };
     };
 
     kwin.virtualDesktops = {
