@@ -118,6 +118,11 @@ a launcher on Meta+Space (Ulauncher there, Vicinae here), so layouts switch with
 login screen is Fedora's too: SilentSDDM's `rei` preset with its edits (`desktop.nix`). (The first version used Breeze Dark and
 the Windows komorebi Alt+H/J/K/L binds; Fedora's setup replaced both.)
 
+The panels themselves aren't declared: plasma-manager's `panels` option rebuilds every panel from
+scratch at login, so every widget's settings would have to live in the repo. Only the main screen's
+taskbar pins are declared, written into the existing panel by a small desktop script at each login
+(MODULES `plasma.nix`).
+
 ## 8. Apps: same app first, then native replacement, then escape hatches
 
 Order of preference for every Windows app:

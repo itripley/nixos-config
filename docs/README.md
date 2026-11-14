@@ -132,6 +132,7 @@ with `scripts/bootstrap.sh` ([OPERATIONS.md](OPERATIONS.md#setting-up-a-new-mach
 | 2026-11-10 | Repo renamed `nixos-config` → `nix-config`: GitHub repo, the checkout path in every config (`programs.nh.flake`, the dotfile and font links), scripts and docs. The bootstrap override variables are now `BOOTSTRAP_REPO` / `BOOTSTRAP_DIR`. Desktop: only those paths change (nix-diff); `~/nixos-config` kept as a symlink until both machines switched | [VERIFICATION.md](VERIFICATION.md#still-to-check-by-hand) |
 | 2026-11-12 | tidal-hifi blank window fixed: launched with `--no-sandbox` (upstream bug, fixed in 9.0) | [VERIFICATION.md](VERIFICATION.md#tidal-hifi-blank-window-2026-11-12) |
 | 2026-11-12 | Plex: window no longer opens as a separate task entry with the Wayland icon; launcher installed as `tv.plex.Plex.desktop` to match the window's app ID (assert from 1.113.0); hand check passed | `a58fa5f`, `apps.nix`, [VERIFICATION.md](VERIFICATION.md#plex-separate-task-entry-2026-11-12) |
+| 2026-11-12 | Main screen's taskbar pins declared (14 apps, set at every login by a desktop script; second screen unmanaged, Atomic Agent left out); three pins that pointed at `/nix/store` paths now use their launcher IDs | `plasma.nix`, MODULES.md, DESIGN §7 |
 | 2026-11-13 | Fish greeting: pokemon-colorscripts replaced by krabby (generations 1–4, no mega/gigantamax/regional forms, built-in 1/128 shiny chance); both machines | `home/shared/shell.nix`, MODULES.md |
 
 ## Conventions

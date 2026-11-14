@@ -472,6 +472,22 @@ the generic Wayland icon.
 - Hand check passed after `nh os switch` (2026-11-12): re-pinned from the app menu, the window opens
   under the pinned icon with no second Wayland-icon entry.
 
+## Taskbar pins (2026-11-12)
+
+- Read from `plasma-org.kde.plasma.desktop-appletsrc`: two panels, one per screen. Screen 0 (DP-1,
+  containment 3, icontasks applet 6) had 15 pins; screen 1 (containment 29) had 4.
+- Three pins pointed at store paths (`file:///nix/store/…-system-path/…/ai.storyteller.photocraft.desktop`,
+  and `termius-app.desktop` and `code.desktop` in a `…-user-environment`). They're declared as
+  `applications:<id>.desktop`. Every declared ID has a launcher in the current profile.
+- Atomic Agent's pin pointed into `~/.cache/appimage-run/<hash>/`. Left out of the list.
+- Read-only dry run of the script's selection over `qdbus … evaluateScript` (`print` instead of
+  `writeConfig`): `panel 3 screen=0 icontasks=1`, `panel 29 screen=1 icontasks=1`. So it writes only to
+  the main screen's widget.
+- Build: the home files have `scripts/4_script_taskbar-launchers.sh` (runs every time, no hash check)
+  and `data/taskbar-launchers.js` with the 14 IDs. `nvd diff`: those two files only (+1.8 KiB).
+  The wallpaper's desktop script is unchanged, so it still runs only when its own content changes.
+- Not run against the live panel yet: see the hand check below.
+
 ## Still to check by hand
 
 The Mac's checks are in [MACOS.md](MACOS.md#checked); all of them are done.
@@ -481,6 +497,7 @@ The Mac's checks are in [MACOS.md](MACOS.md#checked); all of them are done.
 | Desktop after the rename to `nix-config` | `nh os switch` (until then `NH_FLAKE` is the old `~/nixos-config`, a symlink to the new folder, so nh still finds the repo). Then log out and back in: session variables come from `/etc/set-environment` once per login, so terminals opened before that keep the old value. Then `echo $NH_FLAKE` → `/home/olivia/nix-config`, and `readlink -f ~/.config/nvim` ends in `nix-config/home/olivia/dotfiles/nvim`. Then `rm ~/nixos-config` (only the symlink) and check that nvim, WezTerm and fastfetch still load their configs. nix-diff before the switch: only the checkout path changes (nh's variable, the dotfile, font, theme and wallpaper links, the login-art message). |
 | Desktop after the any-machine restructure | `nh os switch`. The diff lists no packages added or removed (order only, above). Then: `systemctl status openrgb-colors` ran, `/mnt/windows` opens, `timedatectl` shows `RTC in local TZ: yes`, `ollama ps` still uses the GPU, the login screen still has the Rei background. |
 | tidal-hifi `--no-sandbox` wrapper | `nh os switch`, quit tidal-hifi (tray too: `pkill -f share/tidal-hifi`) and start it again. The TIDAL home page loads, a track plays, and `coredumpctl list tidal-hifi --since -5min` shows no new dumps. `pgrep -af tidal-hifi` shows `--no-sandbox` on the main process. |
+| Taskbar pins | `nh os switch`, then log out and back in (or run `~/.local/share/plasma-manager/scripts/4_script_taskbar-launchers.sh` to apply them now). The main screen shows the 14 pins in order with their icons, and Atomic Agent's pin is gone. The second screen keeps its 4. Then pin or unpin something on the main screen and log in again: it's back to the 14. |
 | krabby greeting (2026-11-13) | `nh os switch` (Mac: `darwin-rebuild switch`). Open a new terminal: the greeting shows a Pokémon from generations 1–4 with its name, never a mega, gigantamax or regional form. `which pokemon-colorscripts` finds nothing. Shinies show up about 1 in 128 times. |
 | Mac after the restructure | `git pull`, `sudo darwin-rebuild switch --flake ~/nix-config#macbook-olivia`. Nothing should change except the revision; `darwin-version --configuration-revision` shows the new commit. |
 | Mac after the rename to `nix-config` | Before pulling: `mv ~/nixos-config ~/nix-config && ln -s nix-config ~/nixos-config`, then `cd ~/nix-config && git remote set-url origin https://github.com/itripley/nix-config.git && git pull`, then `sudo darwin-rebuild switch --flake ~/nix-config#macbook-olivia`. Check that `readlink ~/.config/nvim` points into `nix-config`, then `rm ~/nixos-config`. Without the move, the switch would point the dotfile links at a folder that doesn't exist. |
